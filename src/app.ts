@@ -6,6 +6,7 @@ import cors from 'cors'; // import cors module for handling Cross-Origin Resourc
 import morgan from 'morgan'; // import morgan module for logging HTTP requests
 
 // import routes
+import authRouter from './routes/authRoute';
 import shortenRouter from './routes/shortenRoute'; // import shortenRouter for handling URL shortening routes
 
 export class App {
@@ -33,6 +34,8 @@ export class App {
         this.app.get('/', (req: Request, res: Response) => { // define a GET route for the root path
             res.send('Hello, welcome to my scissor API.'); // send a welcome message as a response
         });
+
+        this.app.use('/auth', authRouter); // use auth middleware to sign and log users in.
 
         this.app.use('/', shortenRouter); // use shortenRouter middleware for handling URL shortening routes
 
