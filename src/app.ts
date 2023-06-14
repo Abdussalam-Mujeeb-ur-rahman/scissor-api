@@ -4,10 +4,17 @@ import bodyParser from 'body-parser'; // import body-parser module for parsing H
 import cookieParser from 'cookie-parser'; // import cookie-parser module for parsing cookies
 import cors from 'cors'; // import cors module for handling Cross-Origin Resource Sharing
 import morgan from 'morgan'; // import morgan module for logging HTTP requests
+import rateLimit from 'express-rate-limit';
 
 // import routes
 import authRouter from './routes/authRoute';
 import shortenRouter from './routes/shortenRoute'; // import shortenRouter for handling URL shortening routes
+
+// Create the rate limit rule
+const apiRequestLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 2, // limit each IP to 2 requests per windowMs
+  });
 
 export class App {
     private app: Application; // declare a private property app of type Application
@@ -28,6 +35,7 @@ export class App {
             origin: '*', // allow all origins
             credentials: true // allow credentials
         }));
+        this.app.use(apiRequestLimiter);
     }
 
     private routes(): void {
