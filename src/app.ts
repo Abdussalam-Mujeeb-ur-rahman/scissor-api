@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser'; // import cookie-parser module for par
 import cors from 'cors'; // import cors module for handling Cross-Origin Resource Sharing
 import morgan from 'morgan'; // import morgan module for logging HTTP requests
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 
 // import routes
 import authRouter from './routes/authRoute';
@@ -31,6 +32,7 @@ export class App {
         this.app.use(bodyParser.json()); // use body-parser middleware for parsing JSON request bodies
         this.app.use(bodyParser.urlencoded({extended: true})); // use body-parser middleware for parsing URL-encoded request bodies
         this.app.use(cookieParser()); // use cookie-parser middleware for parsing cookies
+        this.app.use(helmet());
         this.app.use(cors({ // use cors middleware for handling CORS
             origin: '*', // allow all origins
             credentials: true // allow credentials

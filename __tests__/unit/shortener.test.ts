@@ -38,7 +38,7 @@ describe("shortenURL", () => {
   // Test case: creates and returns a new URL if it doesn't exist in the database
   it("creates and returns a new URL if it doesn't exist in the database", async () => {
     // Define the original URL, short_id, and the new URL object for testing
-    const originalURL = "https://www.twitter.com";
+    const originalURL = "https://www.google.com";
     const short_id = "new_id";
     const newURL = {
       original_url: originalURL,
@@ -48,15 +48,14 @@ describe("shortenURL", () => {
     // Mock URL_Model.findOne to return null (URL not found in the database)
     URL_Model.findOne = jest.fn().mockResolvedValue(null);
 
-    // Mock URL_Model.prototype.save to return the new URL object
-    URL_Model.prototype.save = jest.fn().mockResolvedValue(newURL);
+    // Mock URL_Model.prototype.save to return the new URL object with an additional _id property
+    URL_Model.prototype.save = jest.fn().mockResolvedValue({ ...newURL, _id: "some_random_id" });
 
     // Mock shortid.generate to return the specified short_id
     shortid.generate = jest.fn().mockReturnValue(short_id);
 
     // Call the shortenURL function and store the result
     const result = await shortenURL(originalURL);
-    console.log(result);
 
     // Check if URL_Model.findOne was called with the correct parameter
     expect(URL_Model.findOne).toHaveBeenCalledWith({ original_url: originalURL });
@@ -64,7 +63,7 @@ describe("shortenURL", () => {
     // Check if shortid.generate was called
     expect(shortid.generate).toHaveBeenCalled();
 
-    // Check if the result matches the new URL object
-    expect(result).toEqual(newURL);
+    // Check if the result object contains the expected properties and values
+    expect(result).toEqual(expect.objectContaining(newURL));
   });
 });
