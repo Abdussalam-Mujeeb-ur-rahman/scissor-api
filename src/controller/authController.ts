@@ -30,7 +30,7 @@ export const generateLink = async (
     const uniqueID = Math.random().toString(36).substring(2, 9);
     console.log(uniqueID);
     randomStrings.set(uniqueID, randomString);
-    const link = `https://scissor.onrender.com/auth/:${uniqueID}`;
+    const link = `https://scissor.onrender.com/auth/${uniqueID}`;
 
     const response = await sendConfirmationEmail(req.body.email, link);
     res.json({ response: response });
