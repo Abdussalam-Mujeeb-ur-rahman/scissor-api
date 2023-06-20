@@ -1,4 +1,7 @@
 // Import necessary modules and classes
+import https from 'https';
+import fs from 'fs';
+
 import express, {Application, Request, Response, NextFunction} from 'express'; // import express module and related types
 import bodyParser from 'body-parser'; // import body-parser module for parsing HTTP request bodies
 import cookieParser from 'cookie-parser'; // import cookie-parser module for parsing cookies
@@ -63,6 +66,14 @@ export class App {
     }
 
     public start(): void {
-        this.app.listen(5050, () => console.log('Server started at http://localhost:5050')); // start the server on port 5050 and log the server URL
-    }
+        // Read the key and certificate files
+        const privateKey = fs.readFileSync('key.pem', 'utf8');
+        const certificate = fs.readFileSync('cert.pem', 'utf8');
+      
+        // Create the HTTPS server
+        const httpsServer = https.createServer({ key: privateKey, cert: certificate }, this.app);
+      
+        httpsServer.listen(5050, () => console.log('Server started at https://localhost:5050')); // start the server on port 5050 and log the server URL
+      }
+      
 };
