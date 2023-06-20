@@ -28,7 +28,6 @@ export const generateLink = async (
     const requestBody = JSON.stringify(req.body);
     const randomString = Buffer.from(requestBody).toString("base64");
     const uniqueID = Math.random().toString(36).substring(2, 9);
-    console.log(uniqueID);
     randomStrings.set(uniqueID, randomString);
     const link = `https://scissor.onrender.com/auth/${uniqueID}`;
 
@@ -112,10 +111,10 @@ export const login = async (
     );
 
     // If the user doesn't exist, respond with a 400 status and an error message
-    if (!user) res.status(400).send({ message: "user doesn't exist!" });
+    if (!user) return res.status(400).send({ message: "user doesn't exist!" });
 
     // Calculate the expected password hash using the stored salt and the provided password
-    const expectedHash = Authentication(user!.authentication.salt, password);
+   const expectedHash = Authentication(user!.authentication.salt, password);
 
     // If the stored password hash doesn't match the expected hash, respond with a 403 status and an error message
     if (user!.authentication.password !== expectedHash)

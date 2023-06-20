@@ -14,7 +14,7 @@ import shortenRouter from './routes/shortenRoute'; // import shortenRouter for h
 // Create the rate limit rule
 const apiRequestLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
-    max: 2, // limit each IP to 2 requests per windowMs
+    max: 30, // limit each IP to 2 requests per windowMs
   });
 
 export class App {
