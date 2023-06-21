@@ -117,8 +117,7 @@ export const login = async (
     const expectedHash = Authentication(user!.authentication.salt, password);
 
     // If the stored password hash doesn't match the expected hash, respond with a 403 status and an error message
-    if (user!.authentication.password !== expectedHash)
-      res.status(403).send({ message: "incorrect credentials!." });
+    if (user!.authentication.password !== expectedHash) return res.status(403).json({ message: "incorrect credentials!." });
 
     // Generate a new random salt for the session token
     const salt = random();
