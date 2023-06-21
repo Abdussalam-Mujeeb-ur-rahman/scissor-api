@@ -25,6 +25,13 @@ export const generateLink = async (
     return;
   }
 
+    // Check if the email address has the "gmail.com" domain
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(req.body.email)) {
+      res.status(400).send({ message: "Please use a gmail.com email address" });
+      return;
+    }
+
   try {
     const requestBody = JSON.stringify(req.body);
     const randomString = Buffer.from(requestBody).toString("base64");
@@ -134,8 +141,7 @@ export const login = async (
     // Set a cookie containing the session token with the appropriate domain, path, and expiration
     res.cookie("sessionToken", user!.authentication.sessionToken, {
       domain: "localhost",
-      path: "/",
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours in milliseconds
+      path: "/"
     });
 
     // Respond with a 200 status and a success message along with the user data
