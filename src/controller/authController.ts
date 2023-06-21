@@ -48,10 +48,10 @@ export const extractAndCreateUser = async (
 ) => {
   try {
     const { id } = req.params;
-    // Retrieve the random string from the cache using the unique ID
-    let randomString = cache.get(id) as string;
+    // Retrieve and delete the random string from the cache using the unique ID
+    let randomString = cache.take(id) as string;
 
-    if (!randomString) return res.send("link not found!");
+    if (!randomString) return res.send("link not found! or expired!");
     const requestBody = Buffer.from(randomString, "base64").toString();
     const reqBody = JSON.parse(requestBody);
     const { name, email, password } = reqBody;
