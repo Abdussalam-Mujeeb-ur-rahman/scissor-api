@@ -5,11 +5,11 @@ Scissors is a simple and efficient URL shortening service. It aims to provide a 
 ## Features
 
 - Sign up a user
-    - check if the email exists in the database
-    - verify if the email really exists by sending a confirmation link to the email
-- Shorten long URLs to concise versions
-- Store original and shortened URLs in a MongoDB database
-- Redirect users to the original URL using the short ID
+    - verify if the email really exists by sending a confirmation link to the email. 
+    - check if the email exists in the database. If not, create a new user.
+- Shorten long URLs to concise versions.
+- Store original and shortened URLs in a MongoDB database.
+- Redirect users to the original URL using the short ID.
 
 ## Installation
 
@@ -43,7 +43,7 @@ npm start
 
 ### Signup URL
 
-- Endpoint: `/auth/signup`
+- Endpoint: `/auth/generate-link`
 - Method: `POST`
 - Request Body: `{
     "name": "your_name",
