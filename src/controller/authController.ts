@@ -1,10 +1,10 @@
 // Import necessary modules and libraries
-import NodeCache from "node-cache";
+import NodeCache from "node-cache"; // Import the NodeCache library for caching [1]
+import { Request, Response, NextFunction } from "express"; // Import the Request, Response, and NextFunction types from the Express library [2]
+import { createUser, getUserByEmail } from "../model/userModel"; // Import the createUser and getUserByEmail functions from the user model [3]
+import { Authentication, random } from "../utils"; // Import the Authentication and random utility functions [4]
+import { sendConfirmationEmail } from "../utils/sendGrid"; // Import the sendConfirmationEmail function from the sendGrid utility module [5]
 
-import { Request, Response, NextFunction } from "express";
-import { createUser, getUserByEmail } from "../model/userModel";
-import { Authentication, random } from "../utils";
-import { sendConfirmationEmail } from "../utils/sendGrid";
 
 // Load environment variables
 require("dotenv").config();
@@ -13,6 +13,7 @@ require("dotenv").config();
 const cache = new NodeCache({ stdTTL: 180 });
 
 // to generate confirmation link.
+// Define an async function called generateLink that takes Request, Response, and NextFunction as parameters
 export const generateLink = async (
   req: Request,
   res: Response,
@@ -25,42 +26,56 @@ export const generateLink = async (
     return;
   }
 
-    // Check if the email address has the "gmail.com" domain
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-    if (!emailRegex.test(req.body.email)) {
-      res.status(400).send({ message: "Please use a gmail.com email address" });
-      return;
-    }
+  // Check if the email address has the "gmail.com" domain
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+  if (!emailRegex.test(req.body.email)) {
+    res.status(400).send({ message: "Please use a gmail.com email address" });
+    return;
+  }
 
   try {
+    // Convert the request body to a JSON string
     const requestBody = JSON.stringify(req.body);
+    // Encode the JSON string as a base64-encoded string
     const randomString = Buffer.from(requestBody).toString("base64");
+    // Generate a unique ID using the Math.random function
     const uniqueID = Math.random().toString(36).substring(2, 9);
     // Save the random string to the cache with the unique ID as the key
     cache.set(uniqueID, randomString);
+    // Generate the confirmation link using the unique ID
     const link = `https://scissor.onrender.com/auth/${uniqueID}`;
 
+    // Send the confirmation email with the generated link
     const response = await sendConfirmationEmail(req.body.email, link);
+    // Send the response as JSON
     res.json({ response: response });
   } catch (error) {
+    // Pass the error to the next middleware function
     next(error);
   }
 };
 
+
 // extract and create user from link sent.
+// Define an async function called extractAndCreateUser that takes Request, Response, and NextFunction as parameters
 export const extractAndCreateUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
+    // Extract the unique ID from the request parameters
     const { id } = req.params;
     // Retrieve and delete the random string from the cache using the unique ID
     let randomString = cache.take(id) as string;
 
+    // If the random string is not found in the cache, send an error message
     if (!randomString) return res.send("link not found! or expired!");
+    // Decode the base64-encoded random string back to a JSON string
     const requestBody = Buffer.from(randomString, "base64").toString();
+    // Parse the JSON string to an object
     const reqBody = JSON.parse(requestBody);
+    // Extract the name, email, and password from the parsed object
     const { name, email, password } = reqBody;
 
     try {
@@ -85,15 +100,19 @@ export const extractAndCreateUser = async (
         },
       });
 
+      // Send a 201 status and a success message along with the created user object
       res.status(201).json({
         message: `user created successfully!`,
         user: user,
       });
     } catch (error) {
+      // Log the error from MongoDB when creating the user
       console.log(` error from mongo on creating user, ${error} `);
+      // Pass the error to the next middleware function
       next(error);
     }
   } catch (error) {
+    // Pass the error to the next middleware function
     next(error);
   }
 };
@@ -140,7 +159,7 @@ export const login = async (
 
     // Set a cookie containing the session token with the appropriate domain, path, and expiration
     res.cookie("sessionToken", user!.authentication.sessionToken, {
-      domain: "localhost",
+      domain: "onrender.com",
       path: "/"
     });
 
