@@ -1,4 +1,5 @@
 // Import necessary modules and libraries
+import NodeCache from "node-cache";
 
 import { Request, Response, NextFunction } from "express";
 import { createUser, getUserByEmail } from "../model/userModel";
@@ -8,8 +9,8 @@ import { sendConfirmationEmail } from "../utils/sendGrid";
 // Load environment variables
 require("dotenv").config();
 
-// Store the mapping between unique IDs and random strings
-const randomStrings: Map<string, string> = new Map();
+// Initialize node-cache with a default TTL (time-to-live) of 3 minutes (180 seconds)
+const cache = new NodeCache({ stdTTL: 180 });
 
 // to generate confirmation link.
 export const generateLink = async (
@@ -28,7 +29,8 @@ export const generateLink = async (
     const requestBody = JSON.stringify(req.body);
     const randomString = Buffer.from(requestBody).toString("base64");
     const uniqueID = Math.random().toString(36).substring(2, 9);
-    randomStrings.set(uniqueID, randomString);
+    // Save the random string to the cache with the unique ID as the key
+    cache.set(uniqueID, randomString);
     const link = `https://scissor.onrender.com/auth/${uniqueID}`;
 
     const response = await sendConfirmationEmail(req.body.email, link);
@@ -38,7 +40,6 @@ export const generateLink = async (
   }
 };
 
-
 // extract and create user from link sent.
 export const extractAndCreateUser = async (
   req: Request,
@@ -47,7 +48,8 @@ export const extractAndCreateUser = async (
 ) => {
   try {
     const { id } = req.params;
-    const randomString = randomStrings.get(id);
+    // Retrieve the random string from the cache using the unique ID
+    let randomString = cache.get(id) as string;
 
     if (!randomString) return res.send("link not found!");
     const requestBody = Buffer.from(randomString, "base64").toString();
@@ -78,10 +80,8 @@ export const extractAndCreateUser = async (
 
       res.status(201).json({
         message: `user created successfully!`,
-        user: user
-      })
-
-
+        user: user,
+      });
     } catch (error) {
       console.log(` error from mongo on creating user, ${error} `);
       next(error);
@@ -114,7 +114,7 @@ export const login = async (
     if (!user) return res.status(400).send({ message: "user doesn't exist!" });
 
     // Calculate the expected password hash using the stored salt and the provided password
-   const expectedHash = Authentication(user!.authentication.salt, password);
+    const expectedHash = Authentication(user!.authentication.salt, password);
 
     // If the stored password hash doesn't match the expected hash, respond with a 403 status and an error message
     if (user!.authentication.password !== expectedHash)

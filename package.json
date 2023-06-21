@@ -51,7 +51,9 @@
     "express-rate-limit": "^6.7.0",
     "helmet": "^7.0.0",
     "morgan": "^1.10.0",
+    "node-cache": "^5.1.2",
     "nodemailer": "^6.9.3",
+    "redis": "^4.6.7",
     "uuid": "^9.0.0"
   }
 }
