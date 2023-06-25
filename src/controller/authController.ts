@@ -117,7 +117,7 @@ export const extractAndCreateUser = async (
   }
 };
 
-// Define the login function
+// Export the login function
 export const login = async (
   req: Request,
   res: Response,
@@ -127,23 +127,31 @@ export const login = async (
     // Destructure email and password from the request body
     const { email, password } = req.body;
 
-    // If email or password is missing, respond with a 400 status and an error message
-    if (!email || !password)
+    // Check if email or password is missing
+    if (!email || !password) {
+      // Respond with a 400 status and an error message
       res.status(400).send({ message: "please fill required fields" });
+    }
 
     // Retrieve the user from the database by email and select the necessary authentication fields
     const user = await getUserByEmail(email).select(
       "+authentication.salt +authentication.password +authentication.sessionToken"
     );
 
-    // If the user doesn't exist, respond with a 400 status and an error message
-    if (!user) return res.status(400).send({ message: "user doesn't exist!" });
+    // Check if the user doesn't exist
+    if (!user) {
+      // Respond with a 400 status and an error message
+      return res.status(400).send({ message: "user doesn't exist!" });
+    }
 
     // Calculate the expected password hash using the stored salt and the provided password
     const expectedHash = Authentication(user!.authentication.salt, password);
 
-    // If the stored password hash doesn't match the expected hash, respond with a 403 status and an error message
-    if (user!.authentication.password !== expectedHash) return res.status(403).json({ message: "incorrect credentials!." });
+    // Check if the stored password hash doesn't match the expected hash
+    if (user!.authentication.password !== expectedHash) {
+      // Respond with a 403 status and an error message
+      return res.status(403).json({ message: "incorrect credentials!." });
+    }
 
     // Generate a new random salt for the session token
     const salt = random();
@@ -157,16 +165,25 @@ export const login = async (
     // Save the updated user document with the new session token
     await user?.save();
 
+    // Calculate the cookie expiration date (4 hours)
+    const expiresIn = 4 * 60 * 60 * 1000;
+    const now = new Date();
+    const expires = new Date(now.getTime() + expiresIn);
+
     // Set a cookie containing the session token with the appropriate domain, path, and expiration
     res.cookie("sessionToken", user!.authentication.sessionToken, {
       domain: "onrender.com",
-      path: "/"
+      path: "/",
+      expires: expires,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
 
     // Respond with a 200 status and a success message along with the user data
     res.status(200).json({ message: "user logged in successfully!", user });
   } catch (error) {
-    // If an error occurs, pass it to the next middleware for error handling
+    // Pass the error to the next middleware for error handling
     next(error);
   }
 };

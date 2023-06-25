@@ -17,23 +17,32 @@ export const isAuthenticated = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const sessionToken = req.cookies.sessionToken; // get the sessionToken from the request cookies
+    // Get the sessionToken from the request cookies
+    const sessionToken = req.cookies.sessionToken;
 
-    if (!sessionToken) { // if there's no sessionToken
-      res.status(404).send({ message: "Unauthorized!" }); // respond with a 404 status and an "Unauthorized!" message
+    console.log(req);
+
+    // If there's no sessionToken
+    if (!sessionToken) {
+      // Respond with a 404 status and an "Unauthorized!" message
+      res.status(404).send({ message: "Unauthorized!" });
       return;
     }
 
-    const existingUser = await getUserBySessionToken(sessionToken); // get the user associated with the sessionToken
+    // Get the user associated with the sessionToken
+    const existingUser = await getUserBySessionToken(sessionToken);
 
-    merge(req, { identity: existingUser }); // merge the existingUser object into the req object, setting it as the identity property
+    // Merge the existingUser object into the req object, setting it as the identity property
+    merge(req, { identity: existingUser });
 
-    next(); // call the next middleware function in the stack
-    
-  } catch (error) { // if an error occurs
-    next(error); // pass the error to the next middleware function in the stack
+    // Call the next middleware function in the stack
+    next();
+  } catch (error) {
+    // Pass the error to the next middleware function in the stack
+    next(error);
   }
 };
+
 
 // Define the isOwner middleware function
 export const isOwner = async (

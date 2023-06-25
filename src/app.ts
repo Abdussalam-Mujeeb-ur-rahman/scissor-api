@@ -1,68 +1,87 @@
 // Import necessary modules and classes
-import express, { Application, Request, Response, NextFunction } from 'express'; // import express module and related types
-import bodyParser from 'body-parser'; // import body-parser module for parsing HTTP request bodies
-import cookieParser from 'cookie-parser'; // import cookie-parser module for parsing cookies
-import cors from 'cors'; // import cors module for handling Cross-Origin Resource Sharing
-import morgan from 'morgan'; // import morgan module for logging HTTP requests
-import rateLimit from 'express-rate-limit'; // import rate-limit module for rate limiting
-import helmet from 'helmet'; // import Helmet module for security 
+import express, { Application, Request, Response, NextFunction } from 'express'; // Import Express module and related types
+import bodyParser from 'body-parser'; // Import body-parser module for parsing HTTP request bodies
+import cookieParser from 'cookie-parser'; // Import cookie-parser module for parsing cookies
+import cors from 'cors'; // Import cors module for handling Cross-Origin Resource Sharing
+import morgan from 'morgan'; // Import morgan module for logging HTTP requests
+import rateLimit from 'express-rate-limit'; // Import rate-limit module for rate limiting
+import helmet from 'helmet'; // Import Helmet module for security
 
-// import routes
-import authRouter from './routes/authRoute'; // import authRouter for handling authentication
-import shortenRouter from './routes/shortenRoute'; // import shortenRouter for handling URL shortening routes
+// Import routes
+import authRouter from './routes/authRoute'; // Import authRouter for handling authentication
+import shortenRouter from './routes/shortenRoute'; // Import shortenRouter for handling URL shortening routes
 
 // Create the rate limit rule
 const apiRequestLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 30, // limit each IP to 30 requests per windowMs
+  windowMs: 1 * 60 * 1000, // Set time window to 1 minute
+  max: 30, // Limit each IP to 30 requests per time window
 });
 
+// Define the App class
 export class App {
-  private app: Application; // declare a private property app of type Application
+  private app: Application; // Declare a private property app of type Application
 
+  // Define the constructor for the App class
   constructor() {
-    this.app = express(); // initialize app as an express application
-    this.config(); // call config method to configure middleware
-    this.routes(); // call routes method to set up routes
-    this.errorHandler(); // call errorHandler method to handle errors
+    this.app = express(); // Initialize app as an express application
+    this.config(); // Call config method to configure middleware
+    this.routes(); // Call routes method to set up routes
+    this.errorHandler(); // Call errorHandler method to handle errors
   }
 
+  // Define the config method for setting up middleware
   private config(): void {
-    this.app.use(morgan('dev')); // use morgan middleware for logging HTTP requests in development mode
-    this.app.use(bodyParser.json()); // use body-parser middleware for parsing JSON request bodies
-    this.app.use(bodyParser.urlencoded({ extended: true })); // use body-parser middleware for parsing URL-encoded request bodies
-    this.app.use(cookieParser()); // use cookie-parser middleware for parsing cookies
-    this.app.use(helmet());
-    this.app.use(cors({ // use cors middleware for handling CORS
-      origin: '*', // allow all origins
-      credentials: true // allow credentials
-    })); 
-    this.app.use(apiRequestLimiter); // use apiRequestLimiter middleware for handling number of requests
+    this.app.use(cookieParser()); // Use cookie-parser middleware for parsing cookies
+    this.app.use(morgan('dev')); // Use morgan middleware for logging HTTP requests in development mode
+    this.app.use(bodyParser.json()); // Use body-parser middleware for parsing JSON request bodies
+    this.app.use(bodyParser.urlencoded({ extended: true })); // Use body-parser middleware for parsing URL-encoded request bodies
+    this.app.use(helmet()); // Use Helmet middleware for security
+    this.app.use(
+      cors({
+        origin: '*', // Allow all origins
+        credentials: true, // Allow credentials (cookies)
+      })
+    );
+    this.app.use(apiRequestLimiter); // Use apiRequestLimiter middleware for handling number of requests
   }
 
+  // Define the routes method for setting up routes
   private routes(): void {
-    this.app.get('/', (req: Request, res: Response) => { // define a GET route for the root path
-      res.send('Hello, welcome to my scissor API.'); // send a welcome message as a response
+    // Define a GET route for the root path
+    this.app.get('/', (req: Request, res: Response) => {
+      // Send a welcome message as a response
+      res.send('Hello, welcome to my scissor API.');
     });
 
-    this.app.use('/auth', authRouter); // use auth middleware to sign and log users in.
+    // Use auth middleware to sign and log users in
+    this.app.use('/auth', authRouter);
 
-    this.app.use('/', shortenRouter); // use shortenRouter middleware for handling URL shortening routes
+    // Use shortenRouter middleware for handling URL shortening routes
+    this.app.use('/', shortenRouter);
 
-    this.app.get('*' || '/*/*', (req: Request, res: Response) => { // define a catch-all GET route for non-existing paths
-      res.status(404).send('Not Found'); // send a 404 Not Found response
+    // Define a catch-all GET route for non-existing paths
+    this.app.get('*' || '/*/*', (req: Request, res: Response) => {
+      // Send a 404 Not Found response
+      res.status(404).send('Not Found');
     });
   }
 
+  // Define the errorHandler method for handling errors
   private errorHandler(): void {
-    this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => { // define error handling middleware
-      res.status(500); // set response status to 500 Internal Server Error
-      console.log(err); // log the error to the console
-      res.end(err.message); // send the error message as a response and end the response
+    // Define error handling middleware
+    this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+      // Set response status to 500 Internal Server Error
+      res.status(500);
+      // Log the error to the console
+      console.log(err);
+      // Send the error message as a response and end the response
+      res.end(err.message);
     });
   }
 
+  // Define the start method for starting the server
   public start(): void {
-    this.app.listen(5050, () => console.log('Server started at http://localhost:5050')); // start the server on port 5050 and log the server URL
+    // Start the server on port 5050 and log the server URL
+    this.app.listen(5050, () => console.log('Server started at http://localhost:5050'));
   }
 };
