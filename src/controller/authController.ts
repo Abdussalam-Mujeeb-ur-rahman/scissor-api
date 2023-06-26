@@ -5,7 +5,6 @@ import { createUser, getUserByEmail } from "../model/userModel"; // Import the c
 import { Authentication, random } from "../utils"; // Import the Authentication and random utility functions [4]
 import { sendConfirmationEmail } from "../utils/sendGrid"; // Import the sendConfirmationEmail function from the sendGrid utility module [5]
 
-
 // Load environment variables
 require("dotenv").config();
 
@@ -54,7 +53,6 @@ export const generateLink = async (
     next(error);
   }
 };
-
 
 // extract and create user from link sent.
 // Define an async function called extractAndCreateUser that takes Request, Response, and NextFunction as parameters
@@ -170,14 +168,21 @@ export const login = async (
     const now = new Date();
     const expires = new Date(now.getTime() + expiresIn);
 
+    // // Set a cookie containing the session token with the appropriate domain, path, and expiration
+    // res.cookie("sessionToken", user!.authentication.sessionToken, {
+    //   domain: "onrender.com",
+    //   path: "/",
+    //   expires: expires,
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "strict",
+    // });
+
     // Set a cookie containing the session token with the appropriate domain, path, and expiration
     res.cookie("sessionToken", user!.authentication.sessionToken, {
-      domain: "onrender.com",
+      domain: "localhost",
       path: "/",
-      expires: expires,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      expires: new Date(Date.now() + 4 * 60 * 60 * 1000), // 4 hours in milliseconds
     });
 
     // Respond with a 200 status and a success message along with the user data

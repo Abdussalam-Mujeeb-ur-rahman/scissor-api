@@ -20,7 +20,7 @@ export const isAuthenticated = async (
     // Get the sessionToken from the request cookies
     const sessionToken = req.cookies.sessionToken;
 
-    console.log(req);
+    console.log(req.cookies);
 
     // If there's no sessionToken
     if (!sessionToken) {
