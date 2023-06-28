@@ -20,8 +20,6 @@ export const isAuthenticated = async (
     // Get the sessionToken from the request cookies
     const sessionToken = req.cookies.sessionToken;
 
-    console.log(req.cookies);
-
     // If there's no sessionToken
     if (!sessionToken) {
       // Respond with a 404 status and an "Unauthorized!" message
@@ -31,6 +29,13 @@ export const isAuthenticated = async (
 
     // Get the user associated with the sessionToken
     const existingUser = await getUserBySessionToken(sessionToken);
+
+    // if the sessionToken isn't the same with the existingUser's
+    if (!existingUser) {
+      // Respond with a 404 status and an "Unauthorized!" message
+      res.status(404).send({ message: "Unauthorized!" });
+      return;
+    }
 
     // Merge the existingUser object into the req object, setting it as the identity property
     merge(req, { identity: existingUser });
@@ -74,3 +79,22 @@ export const isOwner = async (
     next(error); // pass the error to the next middleware function in the stack
   }
 };
+
+export const isAdmin = async(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userRole = get(req, "identity.role"); // get the role of the "identity" object in the request.
+
+    if (userRole !== 'admin') { // if the userRole is not "admin".
+      res.status(404).json({message: 'operation not found in your bracket!'}); // respond with a 404 status and send an error message.
+      return;
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+}

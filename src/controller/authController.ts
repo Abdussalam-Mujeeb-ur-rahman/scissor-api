@@ -54,6 +54,7 @@ export const generateLink = async (
   }
 };
 
+
 // extract and create user from link sent.
 // Define an async function called extractAndCreateUser that takes Request, Response, and NextFunction as parameters
 export const extractAndCreateUser = async (
@@ -166,7 +167,7 @@ export const login = async (
     // Calculate the cookie expiration date (4 hours)
     const expiresIn = 4 * 60 * 60 * 1000;
     const now = new Date();
-    const expires = new Date(now.getTime() + expiresIn);
+    const expire = new Date(now.getTime() + expiresIn);
 
     // // Set a cookie containing the session token with the appropriate domain, path, and expiration
     // res.cookie("sessionToken", user!.authentication.sessionToken, {
@@ -182,7 +183,7 @@ export const login = async (
     res.cookie("sessionToken", user!.authentication.sessionToken, {
       domain: "localhost",
       path: "/",
-      expires: new Date(Date.now() + 4 * 60 * 60 * 1000), // 4 hours in milliseconds
+      expires: expire, // 4 hours in milliseconds
     });
 
     // Respond with a 200 status and a success message along with the user data

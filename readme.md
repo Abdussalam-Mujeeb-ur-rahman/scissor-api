@@ -4,9 +4,18 @@ Scissors is a simple and efficient URL shortening service. It aims to provide a 
 
 ## Features
 
+### User
 - Sign up a user
     - verify if the email really exists by sending a confirmation link to the email. 
     - check if the email exists in the database. If not, create a new user.
+- Login user
+- Delete user
+    - check if user is authenticated, and check if user owns the account to be deleted
+- Update user
+    - check if user is authenticated, and check if user owns the account to be updated
+
+
+### Url    
 - Shorten long URLs to concise versions.
 - Store original and shortened URLs in a MongoDB database.
 - Redirect users to the original URL using the short ID.

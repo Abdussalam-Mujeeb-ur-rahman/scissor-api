@@ -10,6 +10,7 @@ import helmet from 'helmet'; // Import Helmet module for security
 // Import routes
 import authRouter from './routes/authRoute'; // Import authRouter for handling authentication
 import shortenRouter from './routes/shortenRoute'; // Import shortenRouter for handling URL shortening routes
+import userRouter from './routes/userRoutes'; // Import user router for handling operation involving getting, updating and deleting users from the database
 
 // Create the rate limit rule
 const apiRequestLimiter = rateLimit({
@@ -55,6 +56,8 @@ export class App {
 
     // Use auth middleware to sign and log users in
     this.app.use('/auth', authRouter);
+
+    this.app.use('/user', userRouter);
 
     // Use shortenRouter middleware for handling URL shortening routes
     this.app.use('/', shortenRouter);
