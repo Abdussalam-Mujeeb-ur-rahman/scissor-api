@@ -2,6 +2,7 @@
 
 Scissors is a simple and efficient URL shortening service. It aims to provide a superior user experience by shortening URLs to their minimal form. This project is built with Express.js, TypeScript, and MongoDB.
 
+Test the api here - [scissor API](https://documenter.getpostman.com/view/23410424/2s93z9aMxk)
 ## Features
 
 ### User
@@ -59,7 +60,6 @@ npm start
     "email": "example@gmail.com",
     "password": "111111"
 }`
-- Response: `{ "name": "your_name", "email": "example@gmail.com" }`
 
 ### Login URL
 
@@ -69,7 +69,6 @@ npm start
     "email": "example@gmail.com",
     "password": "111111"
 }`
-- Response: `{ message: "user logged in successfully!", user }`
 
 ### Shorten URL
 
@@ -84,11 +83,26 @@ npm start
 - Method: `GET`
 - Response: Redirects to the original URL associated with the `short_id`
 
+### Get all users - only admins
+- Endpoint: `/getAllUsers`
+- Method: `GET`
+
+### Delete user - only owners
+- Endpoint: `/deleteUser/:id`
+- Method: `DELETE`
+
+### Update user - only owners
+- Endpoint: `/updateUser/:id`
+- Method: `PATCH`
+- Request Body: `{ "name": "my_name" }`
+ Only names can be updated here, lol. A route will be coming for forgotten password and changing email
+
 ### Things I am still looking forward to do:
-  - Logging with Sentry - done
+  - A route for forgotten password and changing email
   - Writing complete test for the application, with Jest
   - Dockerizing
-  - Write complete documentation, with Postman
+  - Write complete documentation, with Postman 
+  - write an article on my challenges
 
 ### Developer's Contact
 
