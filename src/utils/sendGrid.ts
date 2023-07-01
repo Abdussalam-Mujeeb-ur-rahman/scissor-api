@@ -1,8 +1,8 @@
 import sgMail from '@sendgrid/mail'; // import the SendGrid mail module for sending emails
 
-import { Env_vars } from '../../config/env_var'; // import the Env_vars class from the config folder to access environment variables
-const env_vars = new Env_vars(); // create a new instance of the Env_vars class to access its properties and methods
-const { SEC_KEY, gmail } = env_vars; // extract the SEC_KEY and gmail properties from the env_vars object
+import { Env_vars } from '../../config/env_var'; // import the Env_vars class from the config folder to access environment variables.
+const env_vars = new Env_vars(); // create a new instance of the Env_vars class to access its properties and methods.
+const { SEC_KEY, gmail } = env_vars; // extract the SEC_KEY and gmail properties from the env_vars object.
 
 sgMail.setApiKey(SEC_KEY); // set the SendGrid API key using the SEC_KEY value
 

@@ -84,6 +84,12 @@ npm start
 - Method: `GET`
 - Response: Redirects to the original URL associated with the `short_id`
 
+### Things I am still looking forward to do:
+  - Logging with Sentry - done
+  - Writing complete test for the application, with Jest
+  - Dockerizing
+  - Write complete documentation, with Postman
+
 ### Developer's Contact
 
 - [twitter](https://twitter.com/allahisrabb?t=kz-S255eO8vb3GCg-PAZ2Q&s=09)

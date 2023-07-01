@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/node'; // Import Sentry module
+
 // Import necessary modules and classes
 import express, { NextFunction, Request, Response } from "express"; // import express and its NextFunction, Request, and Response types
 import { get, identity, merge } from "lodash"; // import 'get', 'identity', and 'merge' utility functions from the lodash library

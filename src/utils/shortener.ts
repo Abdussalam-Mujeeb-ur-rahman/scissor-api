@@ -13,8 +13,6 @@ export const shortenURL = async (
 
   const short_id = shortid.generate(); // generate a unique short ID using shortid module
 
-  console.log(short_id); // log the generated short ID to the console
-
   const newURL = new URL_Model({ original_url: originalURL, short_id }); // create a new URL document with the original URL and generated short ID
 
   await newURL.save(); // save the new URL document to the database

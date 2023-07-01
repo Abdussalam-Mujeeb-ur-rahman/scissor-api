@@ -9,6 +9,7 @@ export class Env_vars {
   public gmail: string;
   // public gmailPass: string;
   public SEC_KEY: string;
+  public DSN: string;
 
   // Constructor for the Env_vars class
   constructor() {
@@ -18,5 +19,6 @@ export class Env_vars {
     this.gmail = process.env.GMAIL!;
     // Assign the SEC_KEY environment variable to the SEC_KEY property
     this.SEC_KEY = process.env.SEC_KEY!;
+    this.DSN = process.env.DSN!;
   }
 }

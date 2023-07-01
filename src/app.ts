@@ -6,6 +6,9 @@ import cors from 'cors'; // Import cors module for handling Cross-Origin Resourc
 import morgan from 'morgan'; // Import morgan module for logging HTTP requests
 import rateLimit from 'express-rate-limit'; // Import rate-limit module for rate limiting
 import helmet from 'helmet'; // Import Helmet module for security
+import * as Sentry from '@sentry/node'; // Import Sentry module
+
+import {initializeSentry} from './utils/sentry';
 
 // Import routes
 import authRouter from './routes/authRoute'; // Import authRouter for handling authentication
@@ -25,6 +28,7 @@ export class App {
   // Define the constructor for the App class
   constructor() {
     this.app = express(); // Initialize app as an express application
+    initializeSentry(this.app); // Initialize Sentry here
     this.config(); // Call config method to configure middleware
     this.routes(); // Call routes method to set up routes
     this.errorHandler(); // Call errorHandler method to handle errors
@@ -32,6 +36,7 @@ export class App {
 
   // Define the config method for setting up middleware
   private config(): void {
+    this.app.use(Sentry.Handlers.requestHandler()); // Add Sentry request handler
     this.app.use(cookieParser()); // Use cookie-parser middleware for parsing cookies
     this.app.use(morgan('dev')); // Use morgan middleware for logging HTTP requests in development mode
     this.app.use(bodyParser.json()); // Use body-parser middleware for parsing JSON request bodies
@@ -43,7 +48,7 @@ export class App {
         credentials: true, // Allow credentials (cookies)
       })
     );
-    this.app.use(apiRequestLimiter); // Use apiRequestLimiter middleware for handling number of requests
+    this.app.use(apiRequestLimiter); // Use apiRequestLimiter middleware for handling number of requests.
   }
 
   // Define the routes method for setting up routes
@@ -71,6 +76,7 @@ export class App {
 
   // Define the errorHandler method for handling errors
   private errorHandler(): void {
+    this.app.use(Sentry.Handlers.errorHandler()); // Add Sentry error handler
     // Define error handling middleware
     this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       // Set response status to 500 Internal Server Error
@@ -78,7 +84,8 @@ export class App {
       // Log the error to the console
       console.log(err);
       // Send the error message as a response and end the response
-      res.end(err.message);
+      Sentry.captureException(err);
+      next();
     });
   }
 
