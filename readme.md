@@ -95,11 +95,7 @@ npm start
 - Endpoint: `/updateUser/:id`
 - Method: `PATCH`
 - Request Body: `{ "name": "my_name" }`
- Only names can be updated here, lol. A route will be coming for forgotten password and changing email
-
 ### Things I am still looking forward to do:
-  - A route for forgotten password and changing email
-  - Writing complete test for the application, with Jest
   - Dockerizing
   - Write complete documentation, with Postman 
   - write an article on my challenges
