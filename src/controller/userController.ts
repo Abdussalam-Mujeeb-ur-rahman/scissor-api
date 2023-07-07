@@ -19,7 +19,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
 
         const deletedUser = await deleteUserById(id);
 
-        return res.json(deletedUser);
+        return res.json({message: "user has been deleted successfully!"});
     } catch (error) {
         next(error)
     }
