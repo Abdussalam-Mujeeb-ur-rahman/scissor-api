@@ -181,10 +181,10 @@ export const login = async (
 
     // Set a cookie containing the session token with the appropriate domain, path, and expiration
     res.cookie("sessionToken", user!.authentication.sessionToken, {
-      domain: "localhost",
+      domain: "scissor.onrender.com",
       path: "/",
       expires: expire, // 4 hours in milliseconds
-    });
+    });    
 
     // Respond with a 200 status and a success message along with the user data
     res.status(200).json({ message: "user logged in successfully!", user });
