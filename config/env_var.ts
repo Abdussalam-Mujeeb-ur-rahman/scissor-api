@@ -10,6 +10,8 @@ export class Env_vars {
   // public gmailPass: string;
   public SEC_KEY: string;
   public DSN: string;
+  public TREBLLE_API_KEY: string;
+  public TREBLLE_PROJECT_ID: string;
 
   // Constructor for the Env_vars class
   constructor() {
@@ -20,5 +22,7 @@ export class Env_vars {
     // Assign the SEC_KEY environment variable to the SEC_KEY property
     this.SEC_KEY = process.env.SEC_KEY!;
     this.DSN = process.env.DSN!;
+    this.TREBLLE_API_KEY = process.env.TREBLLE_API_KEY!;
+    this.TREBLLE_PROJECT_ID = process.env.TREBLLE_PROJECT_ID!;
   }
 }

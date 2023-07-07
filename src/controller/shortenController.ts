@@ -2,14 +2,13 @@
 import {Request ,Response, NextFunction} from 'express'; // import Request, Response, and NextFunction types from express module
 
 import {shortenURL} from '../utils/shortener'; // import shortenURL function from shortener utility
-import {URL_Model} from '../model/urlModel' // import URL_Model from urlModel
+import {URL_Model} from '../model/urlModel' // import URL_Model from urlModel.
+
 
 // Define an async function to create a new shortened URL
 export const createNewUrl = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const {url} = req.body; // extract the url from the request body
-
-        console.log(url); // log the received url to the console
 
         if(!url) return res.json({message: 'Please send a valid url'}); // if the url is not provided, return an error message
 

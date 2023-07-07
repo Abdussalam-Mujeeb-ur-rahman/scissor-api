@@ -7,6 +7,7 @@ import morgan from 'morgan'; // Import morgan module for logging HTTP requests
 import rateLimit from 'express-rate-limit'; // Import rate-limit module for rate limiting
 import helmet from 'helmet'; // Import Helmet module for security
 import * as Sentry from '@sentry/node'; // Import Sentry module
+import trebble from '@treblle/express'; // Import treblle module
 
 import {initializeSentry} from './utils/sentry';
 
@@ -14,6 +15,10 @@ import {initializeSentry} from './utils/sentry';
 import authRouter from './routes/authRoute'; // Import authRouter for handling authentication
 import shortenRouter from './routes/shortenRoute'; // Import shortenRouter for handling URL shortening routes
 import userRouter from './routes/userRoutes'; // Import user router for handling operation involving getting, updating and deleting users from the database
+
+import {Env_vars} from '../config/env_var';
+const env_vars = new Env_vars();
+const {TREBLLE_API_KEY, TREBLLE_PROJECT_ID} = env_vars
 
 // Create the rate limit rule
 const apiRequestLimiter = rateLimit({
@@ -36,6 +41,11 @@ export class App {
 
   // Define the config method for setting up middleware
   private config(): void {
+    this.app.use(trebble({
+      apiKey: TREBLLE_API_KEY,
+      projectId: TREBLLE_PROJECT_ID,
+      additionalFieldsToMask: []
+    })); // Add trebble middleware
     this.app.use(Sentry.Handlers.requestHandler()); // Add Sentry request handler
     this.app.use(cookieParser()); // Use cookie-parser middleware for parsing cookies
     this.app.use(morgan('dev')); // Use morgan middleware for logging HTTP requests in development mode
@@ -56,7 +66,8 @@ export class App {
     // Define a GET route for the root path
     this.app.get('/', (req: Request, res: Response) => {
       // Send a welcome message as a response
-      res.send('Hello, welcome to my scissor API.');
+      res.json({message: 'Hello, welcome to my scissor API.'});
+      return;
     });
 
     // Use auth middleware to sign and log users in
