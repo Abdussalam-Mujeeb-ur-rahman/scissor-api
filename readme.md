@@ -98,6 +98,7 @@ npm start
 ### Things I am still looking forward to do:
   - Dockerizing
   - Write complete documentation, with Postman 
+  - Design the homepage
 
 ### Links To Articles
 - [Validate requests with JOI](https://allahisrabb.hashnode.dev/validating-post-requests-in-express-with-joi-and-typescript)
