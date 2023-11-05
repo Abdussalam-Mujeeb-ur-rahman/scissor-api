@@ -14,7 +14,7 @@ const cache = new NodeCache({ stdTTL: 180 });
 
 // to generate confirmation link.
 // Define an async function called generateLink that takes Request, Response, and NextFunction as parameters
-export const  generateLink = async (
+export const generateLink = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -63,8 +63,6 @@ export const CreateUser = async (
 ) => {
   try {
     const userData = await extractUserData(req, res, next);
-
-    console.log(userData);
 
     if (!userData) {
       // Handle the case where user data extraction fails, e.g., send an error response
