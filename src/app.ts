@@ -4,7 +4,7 @@ import bodyParser from 'body-parser'; // Import body-parser module for parsing H
 import cookieParser from 'cookie-parser'; // Import cookie-parser module for parsing cookies
 import cors from 'cors'; // Import cors module for handling Cross-Origin Resource Sharing
 import morgan from 'morgan'; // Import morgan module for logging HTTP requests
-// import rateLimit from 'express-rate-limit'; // Import rate-limit module for rate limiting
+import rateLimit from 'express-rate-limit'; // Import rate-limit module for rate limiting
 import helmet from 'helmet'; // Import Helmet module for security
 import * as Sentry from '@sentry/node'; // Import Sentry module
 import trebble from '@treblle/express'; // Import treblle module
@@ -21,10 +21,10 @@ const env_vars = new Env_vars();
 const {TREBLLE_API_KEY, TREBLLE_PROJECT_ID} = env_vars
 
 // Create the rate limit rule
-// const apiRequestLimiter = rateLimit({
-//   windowMs: 1 * 60 * 1000, // Set time window to 1 minute
-//   max: 30, // Limit each IP to 30 requests per time window
-// });
+const apiRequestLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // Set time window to 1 minute
+  max: 30, // Limit each IP to 30 requests per time window
+});
 
 // Define the App class
 export class App {
@@ -58,7 +58,7 @@ export class App {
         credentials: true, // Allow credentials (cookies)
       })
     );
-    // this.app.use(apiRequestLimiter); // Use apiRequestLimiter middleware for handling number of requests.
+    this.app.use(apiRequestLimiter); // Use apiRequestLimiter middleware for handling number of requests.
   }
 
   // Define the routes method for setting up routes
@@ -103,6 +103,6 @@ export class App {
   // Define the start method for starting the server
   public start(): void {
     // Start the server on port 5050 and log the server URL
-    this.app.listen(5050, () => console.log('Server started at port 5050'));
+    this.app.listen(5050, () => console.log('Server started at http://localhost:5050'));
   }
 };
