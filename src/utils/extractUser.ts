@@ -13,8 +13,10 @@ export const extractUserData = async (
   try {
     // Extract the unique ID from the request parameters
     const { id } = req.params;
+    console.log(id);
     // Retrieve and delete the random string from the cache using the unique ID
     let randomString = cache.take(id) as string;
+    console.log(randomString);
     // If the random string is not found in the cache, send an error message
     if (!randomString) {
       return null; // Return null if user data extraction fails
@@ -24,6 +26,7 @@ export const extractUserData = async (
     const requestBody = Buffer.from(randomString, "base64").toString();
     // Parse the JSON string to an object
     const reqBody = JSON.parse(requestBody);
+    console.log(reqBody);
     // Extract the name, email, and password from the parsed object
     const { name, email, password } = reqBody;
 
