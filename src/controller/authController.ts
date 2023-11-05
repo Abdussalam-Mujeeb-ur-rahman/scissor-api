@@ -44,7 +44,6 @@ export const  generateLink = async (
     cache.set(uniqueID, randomString);
     // Generate the confirmation link using the unique ID
     const link = `https://scissor.onrender.com/auth/${uniqueID}`;
-    console.log(link);
 
     // Send the confirmation email with the generated link
     const response = await sendConfirmationEmail(req.body.email, link);
