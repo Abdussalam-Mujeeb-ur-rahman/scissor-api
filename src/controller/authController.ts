@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express"; // Import the Request
 import { createUser, getUserByEmail } from "../model/userModel"; // Import the createUser and getUserByEmail functions from the user model [3]
 import { Authentication, random } from "../utils"; // Import the Authentication and random utility functions [4]
 import { sendConfirmationEmail } from "../utils/sendGrid"; // Import the sendConfirmationEmail function from the sendGrid utility module [5]
+import { extractUserData } from "../utils/extractUser";
 
 // Load environment variables
 require("dotenv").config();
@@ -54,28 +55,22 @@ export const generateLink = async (
   }
 };
 
-
-// extract and create user from link sent.
-// Define an async function called extractAndCreateUser that takes Request, Response, and NextFunction as parameters
-export const extractAndCreateUser = async (
+// Function to create a user
+export const CreateUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    // Extract the unique ID from the request parameters
-    const { id } = req.params;
-    // Retrieve and delete the random string from the cache using the unique ID
-    let randomString = cache.take(id) as string;
+    const userData = await extractUserData(req, res, next);
 
-    // If the random string is not found in the cache, send an error message
-    if (!randomString) return res.send("link not found! or expired!");
-    // Decode the base64-encoded random string back to a JSON string
-    const requestBody = Buffer.from(randomString, "base64").toString();
-    // Parse the JSON string to an object
-    const reqBody = JSON.parse(requestBody);
-    // Extract the name, email, and password from the parsed object
-    const { name, email, password } = reqBody;
+    if (!userData) {
+      // Handle the case where user data extraction fails, e.g., send an error response
+      res.status(400).send("Failed to extract user data");
+      return;
+    }
+
+    const { name, email, password } = userData;
 
     try {
       // Check if a user with the provided email already exists
@@ -101,12 +96,12 @@ export const extractAndCreateUser = async (
 
       // Send a 201 status and a success message along with the created user object
       res.status(201).json({
-        message: `user created successfully!`,
+        message: `User created successfully!`,
         user: user,
       });
     } catch (error) {
       // Log the error from MongoDB when creating the user
-      console.log(` error from mongo on creating user, ${error} `);
+      console.log(`Error from MongoDB on creating user, ${error}`);
       // Pass the error to the next middleware function
       next(error);
     }
@@ -184,7 +179,7 @@ export const login = async (
       domain: "scissor.onrender.com",
       path: "/",
       expires: expire, // 4 hours in milliseconds
-    });    
+    });
 
     // Respond with a 200 status and a success message along with the user data
     res.status(200).json({ message: "user logged in successfully!", user });
