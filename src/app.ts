@@ -103,6 +103,6 @@ export class App {
   // Define the start method for starting the server
   public start(): void {
     // Start the server on port 5050 and log the server URL
-    this.app.listen(5002, () => console.log('Server started at port 5002'));
+    this.app.listen(5050, () => console.log('Server started at port 5050'));
   }
 };
