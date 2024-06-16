@@ -36,17 +36,16 @@ cd scissors-api
 npm install
 ```
 
-3. Create a `.env` file in the root directory and add your MongoDB connection string:
+3. Create a `.env` file in the root directory and add your MongoDB connection string (check `.env.example` for all environment variables needed):
 
 ```
 MONGODB_URI=<your-mongodb-connection-string>
 ```
 
-4. Compile TypeScript and start the server:
+4. Run nodemon:
 
 ```
-npm run build
-npm start
+npx nodemon
 ```
 
 ## API Endpoints

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon",
-    "test": "jest"
+    "test": "jest",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",

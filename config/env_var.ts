@@ -12,6 +12,7 @@ export class Env_vars {
   public DSN: string;
   public TREBLLE_API_KEY: string;
   public TREBLLE_PROJECT_ID: string;
+  public NODE_ENV: string;
 
   // Constructor for the Env_vars class
   constructor() {
@@ -24,5 +25,6 @@ export class Env_vars {
     this.DSN = process.env.DSN!;
     this.TREBLLE_API_KEY = process.env.TREBLLE_API_KEY!;
     this.TREBLLE_PROJECT_ID = process.env.TREBLLE_PROJECT_ID!;
+    this.NODE_ENV = process.env.NODE_ENV!;
   }
 }

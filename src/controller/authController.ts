@@ -4,12 +4,17 @@ import { Request, Response, NextFunction } from "express"; // Import the Request
 import { createUser, getUserByEmail } from "../model/userModel"; // Import the createUser and getUserByEmail functions from the user model [3]
 import { Authentication, random } from "../utils"; // Import the Authentication and random utility functions [4]
 import { sendConfirmationEmail } from "../utils/sendGrid"; // Import the sendConfirmationEmail function from the sendGrid utility module [5]
+import {Env_vars} from "../../config/env_var"; // import the Env_vars class from the config folder to access environment variables.
+const env_vars = new Env_vars(); // create a new instance of the Env_vars class to access its properties and methods.
+const { NODE_ENV } = env_vars; // extract the NODE_ENV property from the env_vars object.
+import extractUser from "../utils/extractUser";
+
 
 // Load environment variables
 require("dotenv").config();
 
-// Initialize node-cache with a default TTL (time-to-live) of 3 minutes (180 seconds)
-const cache = new NodeCache({ stdTTL: 180 });
+// Initialize node-cache with a default TTL (time-to-live) of 1 day
+const cache = new NodeCache({ stdTTL: 86400 });
 
 // to generate confirmation link.
 // Define an async function called generateLink that takes Request, Response, and NextFunction as parameters
@@ -42,7 +47,9 @@ export const generateLink = async (
     // Save the random string to the cache with the unique ID as the key
     cache.set(uniqueID, randomString);
     // Generate the confirmation link using the unique ID
-    const link = `https://scissor.onrender.com/auth/${uniqueID}`;
+    const link = `${req.protocol}://${req.get("host")}/auth/${uniqueID}`;
+
+    console.log("link", link);
 
     // Send the confirmation email with the generated link
     const response = await sendConfirmationEmail(req.body.email, link);
@@ -56,8 +63,8 @@ export const generateLink = async (
 
 
 // extract and create user from link sent.
-// Define an async function called extractAndCreateUser that takes Request, Response, and NextFunction as parameters
-export const extractAndCreateUser = async (
+// Define an async function called CreateUser that takes Request, Response, and NextFunction as parameters
+export const CreateUser = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -65,15 +72,15 @@ export const extractAndCreateUser = async (
   try {
     // Extract the unique ID from the request parameters
     const { id } = req.params;
-    // Retrieve and delete the random string from the cache using the unique ID
-    let randomString = cache.take(id) as string;
 
-    // If the random string is not found in the cache, send an error message
-    if (!randomString) return res.send("link not found! or expired!");
-    // Decode the base64-encoded random string back to a JSON string
-    const requestBody = Buffer.from(randomString, "base64").toString();
-    // Parse the JSON string to an object
-    const reqBody = JSON.parse(requestBody);
+    console.log("id", id)
+    
+    const reqBody = extractUser(id, cache);
+
+    if (!reqBody) {
+      return res.status(404).send("link not found! or expired!");
+    }
+
     // Extract the name, email, and password from the parsed object
     const { name, email, password } = reqBody;
 
@@ -168,23 +175,20 @@ export const login = async (
     const expiresIn = 4 * 60 * 60 * 1000;
     const now = new Date();
     const expire = new Date(now.getTime() + expiresIn);
-
-    // // Set a cookie containing the session token with the appropriate domain, path, and expiration
-    // res.cookie("sessionToken", user!.authentication.sessionToken, {
-    //   domain: "onrender.com",
-    //   path: "/",
-    //   expires: expires,
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   sameSite: "strict",
-    // });
-
-    // Set a cookie containing the session token with the appropriate domain, path, and expiration
-    res.cookie("sessionToken", user!.authentication.sessionToken, {
-      domain: "scissor.onrender.com",
+    const options = {
+      domain: "localhost",
       path: "/",
       expires: expire, // 4 hours in milliseconds
-    });    
+      httpOnly: true,
+      signed: true,
+    };
+
+    if (NODE_ENV === "production") {
+      options.domain = "scissor.onrender.com";
+    }
+
+    // Set a cookie containing the session token with the appropriate domain, path, and expiration
+    res.cookie("sessionToken", user!.authentication.sessionToken, options);    
 
     // Respond with a 200 status and a success message along with the user data
     res.status(200).json({ message: "user logged in successfully!", user });
