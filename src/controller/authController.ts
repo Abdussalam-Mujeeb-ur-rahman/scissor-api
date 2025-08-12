@@ -4,11 +4,10 @@ import { Request, Response, NextFunction } from "express"; // Import the Request
 import { createUser, getUserByEmail } from "../model/userModel"; // Import the createUser and getUserByEmail functions from the user model [3]
 import { Authentication, random } from "../utils"; // Import the Authentication and random utility functions [4]
 import { sendConfirmationEmail } from "../utils/sendGrid"; // Import the sendConfirmationEmail function from the sendGrid utility module [5]
-import {Env_vars} from "../../config/env_var"; // import the Env_vars class from the config folder to access environment variables.
+import { Env_vars } from "../../config/env_var"; // import the Env_vars class from the config folder to access environment variables.
 const env_vars = new Env_vars(); // create a new instance of the Env_vars class to access its properties and methods.
 const { NODE_ENV } = env_vars; // extract the NODE_ENV property from the env_vars object.
 import extractUser from "../utils/extractUser";
-
 
 // Load environment variables
 require("dotenv").config();
@@ -53,14 +52,22 @@ export const generateLink = async (
 
     // Send the confirmation email with the generated link
     const response = await sendConfirmationEmail(req.body.email, link);
-    // Send the response as JSON
-    res.json({ response: response });
+
+    // In development mode, also return the confirmation link in the response
+    if (NODE_ENV === "development") {
+      res.json({
+        response: response,
+        confirmationLink: link,
+        message: "Check the confirmation link in the response for testing",
+      });
+    } else {
+      res.json({ response: response });
+    }
   } catch (error) {
     // Pass the error to the next middleware function
     next(error);
   }
 };
-
 
 // extract and create user from link sent.
 // Define an async function called CreateUser that takes Request, Response, and NextFunction as parameters
@@ -73,8 +80,8 @@ export const CreateUser = async (
     // Extract the unique ID from the request parameters
     const { id } = req.params;
 
-    console.log("id", id)
-    
+    console.log("id", id);
+
     const reqBody = extractUser(id, cache);
 
     if (!reqBody) {
@@ -175,12 +182,10 @@ export const login = async (
     const expiresIn = 4 * 60 * 60 * 1000;
     const now = new Date();
     const expire = new Date(now.getTime() + expiresIn);
-    const options = {
-      domain: "localhost",
+    const options: any = {
       path: "/",
       expires: expire, // 4 hours in milliseconds
       httpOnly: true,
-      signed: true,
     };
 
     if (NODE_ENV === "production") {
@@ -188,7 +193,7 @@ export const login = async (
     }
 
     // Set a cookie containing the session token with the appropriate domain, path, and expiration
-    res.cookie("sessionToken", user!.authentication.sessionToken, options);    
+    res.cookie("sessionToken", user!.authentication.sessionToken, options);
 
     // Respond with a 200 status and a success message along with the user data
     res.status(200).json({ message: "user logged in successfully!", user });

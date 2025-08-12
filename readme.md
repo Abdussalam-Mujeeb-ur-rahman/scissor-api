@@ -1,108 +1,238 @@
-# Scissors API
+# Scissor API
 
-Scissors is a simple and efficient URL shortening service. It aims to provide a superior user experience by shortening URLs to their minimal form. This project is built with Express.js, TypeScript, and MongoDB.
+A URL shortening API built with Node.js, Express, TypeScript, and MongoDB.
 
-Test the api here - [scissor API](https://documenter.getpostman.com/view/23410424/2s93z9aMxk)
 ## Features
 
-### User
-- Sign up a user
-    - verify if the email really exists by sending a confirmation link to the email. 
-    - check if the email exists in the database. If not, create a new user.
-- Login user
-- Delete user
-    - check if user is authenticated, and check if user owns the account to be deleted
-- Update user
-    - check if user is authenticated, and check if user owns the account to be updated
+- **User Authentication**: Signup, email confirmation, and login with session-based authentication
+- **URL Shortening**: Create short URLs from long URLs
+- **URL Redirection**: Access short URLs to redirect to original URLs
+- **Security**: Helmet for security headers, rate limiting, CORS, input validation
+- **Monitoring**: Sentry for error tracking, Treblle for API monitoring
+- **Email Service**: Nodemailer with Gmail SMTP for email confirmation
 
+## Tech Stack
 
-### Url    
-- Shorten long URLs to concise versions.
-- Store original and shortened URLs in a MongoDB database.
-- Redirect users to the original URL using the short ID.
+- **Backend**: Node.js, Express.js, TypeScript
+- **Database**: MongoDB with Mongoose ORM
+- **Authentication**: Session-based with cookies
+- **Email**: Nodemailer with Gmail SMTP
+- **Security**: Helmet, express-rate-limit, CORS
+- **Validation**: Joi for request validation
+- **Monitoring**: Sentry, Treblle, Morgan
+- **Testing**: Jest with ts-jest
+
+## Prerequisites
+
+- Node.js (v14 or higher)
+- MongoDB database
+- Gmail account with App Password
 
 ## Installation
 
-1.  Clone the repository:
+1. Clone the repository:
 
-```
-git clone https://github.com/yourusername/scissors-api.git
-cd scissors-api
+```bash
+git clone <repository-url>
+cd scissor-api
 ```
 
-2. Install the dependencies:
+2. Install dependencies:
 
-```
+```bash
 npm install
 ```
 
-3. Create a `.env` file in the root directory and add your MongoDB connection string (check `.env.example` for all environment variables needed):
+3. Create a `.env` file in the root directory with the following variables:
 
-```
-MONGODB_URI=<your-mongodb-connection-string>
+```env
+SECRET=your_secret_key_here
+GMAIL=your_gmail@gmail.com
+GMAIL_PASS=your_gmail_app_password
+SEC_KEY=your_sentry_secret_key
+DSN=your_sentry_dsn
+TREBLLE_API_KEY=your_treblle_api_key
+TREBLLE_PROJECT_ID=your_treblle_project_id
+NODE_ENV=development
 ```
 
-4. Run nodemon:
+**Important**: For Gmail, you need to:
 
+1. Enable 2-factor authentication
+2. Generate an App Password (not your regular password)
+3. Use the App Password in `GMAIL_PASS`
+
+## Running the Application
+
+### Development Mode
+
+```bash
+npm start
 ```
-npx nodemon
+
+The server will start on `http://localhost:3000`
+
+### Production Build
+
+```bash
+npm run build
+node dist/src/index.js
+```
+
+### Running Tests
+
+```bash
+npm test
 ```
 
 ## API Endpoints
 
-### Signup URL
+### Authentication
 
-- Endpoint: `/auth/generate-link`
-- Method: `POST`
-- Request Body: `{
-    "name": "your_name",
-    "email": "example@gmail.com",
-    "password": "111111"
-}`
+#### Signup
 
-### Login URL
+```http
+POST /auth
+Content-Type: application/json
 
-- Endpoint: `/auth/login`
-- Method: `POST`
-- Request Body: `{
-    "email": "example@gmail.com",
-    "password": "111111"
-}`
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
 
-### Shorten URL
+#### Email Confirmation
 
-- Endpoint: `/new`
-- Method: `POST`
-- Request Body: `{ "url": "https://www.example.com" }`
-- Response: `{ "original_url": "https://www.example.com", "short_id": "abc123" }`
+```http
+GET /auth/{confirmationId}
+```
 
-### Redirect to Original URL
+#### Login
 
-- Endpoint: `/:short_id`
-- Method: `GET`
-- Response: Redirects to the original URL associated with the `short_id`
+```http
+POST /auth/login
+Content-Type: application/json
 
-### Get all users - only admins
-- Endpoint: `/getAllUsers`
-- Method: `GET`
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
 
-### Delete user - only owners
-- Endpoint: `/deleteUser/:id`
-- Method: `DELETE`
+### URL Shortening (Protected)
 
-### Update user - only owners
-- Endpoint: `/updateUser/:id`
-- Method: `PATCH`
-- Request Body: `{ "name": "my_name" }`
-### Things I am still looking forward to do:
-  - Dockerizing
-  - Write complete documentation, with Postman 
-  - Design the homepage
+#### Create Short URL
 
-### Links To Articles
-- [Validate requests with JOI](https://allahisrabb.hashnode.dev/validating-post-requests-in-express-with-joi-and-typescript)
+```http
+POST /new
+Content-Type: application/json
+Cookie: sessionToken=your_session_token
 
-### Developer's Contact
+{
+  "url": "https://www.example.com/very/long/url"
+}
+```
 
-- [twitter](https://twitter.com/allahisrabb?t=kz-S255eO8vb3GCg-PAZ2Q&s=09)
-- [portfolio](https://cv1.mujeeburrahman.repl.co)
+#### Access Short URL
+
+```http
+GET /{shortId}
+```
+
+### User Management (Protected)
+
+#### Get All Users
+
+```http
+GET /user
+Cookie: sessionToken=your_session_token
+```
+
+#### Get User by ID
+
+```http
+GET /user/{userId}
+Cookie: sessionToken=your_session_token
+```
+
+#### Update User
+
+```http
+PATCH /user/{userId}
+Content-Type: application/json
+Cookie: sessionToken=your_session_token
+
+{
+  "name": "Updated Name"
+}
+```
+
+#### Delete User
+
+```http
+DELETE /user/{userId}
+Cookie: sessionToken=your_session_token
+```
+
+## Security Features
+
+- **Helmet**: Security headers
+- **Rate Limiting**: 30 requests per minute per IP
+- **CORS**: Cross-origin resource sharing
+- **Input Validation**: Joi validation for all requests
+- **Password Hashing**: HMAC-SHA256 with salt
+- **Session Tokens**: Secure session management
+- **HttpOnly Cookies**: XSS protection
+
+## Development Notes
+
+- **Email Service**: Uses Nodemailer with Gmail SMTP
+- **Session Management**: Uses signed cookies (removed signing for localhost compatibility)
+- **Database**: MongoDB with Mongoose schemas
+- **Error Handling**: Comprehensive error handling with Sentry integration
+- **Logging**: Morgan for HTTP request logging
+
+## Testing
+
+The application includes unit tests for:
+
+- Authentication functions
+- Email sending
+- URL shortening
+- Sentry integration
+
+Run tests with:
+
+```bash
+npm test
+```
+
+## Deployment
+
+For production deployment:
+
+1. Set `NODE_ENV=production` in your environment variables
+2. Update the cookie domain in `authController.ts` for your production domain
+3. Ensure all environment variables are properly configured
+4. Use a process manager like PM2 for production
+
+## Troubleshooting
+
+### Email Issues
+
+- Ensure Gmail App Password is correct
+- Check that 2FA is enabled on Gmail
+- Verify SMTP settings in development
+
+### Authentication Issues
+
+- Check that the SECRET environment variable is set
+- Ensure cookies are being sent with requests
+- Verify session tokens are being stored in the database
+
+### Database Issues
+
+- Ensure MongoDB is running and accessible
+- Check connection string and credentials
+- Verify database permissions
