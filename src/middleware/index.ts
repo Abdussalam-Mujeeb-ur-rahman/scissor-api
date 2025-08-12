@@ -81,22 +81,3 @@ export const isOwner = async (
     next(error); // pass the error to the next middleware function in the stack
   }
 };
-
-export const isAdmin = async(
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const userRole = get(req, "identity.role"); // get the role of the "identity" object in the request.
-
-    if (userRole !== 'admin') { // if the userRole is not "admin".
-      res.status(404).json({message: 'operation not found in your bracket!'}); // respond with a 404 status and send an error message.
-      return;
-    }
-
-    next();
-  } catch (error) {
-    next(error);
-  }
-}

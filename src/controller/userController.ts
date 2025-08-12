@@ -1,17 +1,6 @@
 import express, {Request, Response, NextFunction} from 'express';
 
-import { deleteUserById, getUserById, getUsers, userModel } from '../model/userModel';
-
-export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const users = await getUsers();
-
-        res.json({users});
-        return;
-    } catch (error) {
-        next(error);
-    }
-};
+import { deleteUserById, getUserById } from '../model/userModel';
 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {

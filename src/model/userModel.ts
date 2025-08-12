@@ -35,7 +35,7 @@ const userSchema = new Schema<iUser>( // create a new mongoose schema with iUser
     role: {
       type: String,
       required: true,
-      enum: ["admin", "user"],
+      enum: ["user"],
       default: "user",
     },
   },
@@ -45,7 +45,6 @@ const userSchema = new Schema<iUser>( // create a new mongoose schema with iUser
 export const userModel = mongoose.model<iUser, UserModel>("User", userSchema); // create a User model using the userSchema and export it as 'userModel'
 
 // Define methods on the User model
-export const getUsers = () => userModel.find(); // define a method to get all users
 export const getUserByEmail = (email: string) => userModel.findOne({ email }); // define a method to get a user by email
 export const getUserBySessionToken = (sessionToken: string) => userModel.findOne({
   'authentication.sessionToken': sessionToken,

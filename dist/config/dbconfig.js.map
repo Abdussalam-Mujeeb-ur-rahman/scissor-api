@@ -1,0 +1,1 @@
+{"version":3,"file":"dbconfig.js","sourceRoot":"","sources":["../../config/dbconfig.ts"],"names":[],"mappings":";;;;;;AAAA,2BAA2B;AAC3B,oDAA4B,CAAC,0DAA0D;AACvF,gBAAM,CAAC,MAAM,EAAE,CAAC,CAAC,gDAAgD;AAEjE,iCAAiC;AACjC,MAAa,QAAQ;IAGjB,gDAAgD;IAChD;QACI,IAAI,CAAC,WAAW,GAAG,OAAO,CAAC,GAAG,CAAC,WAAY,CAAC,CAAC,uFAAuF;IACxI,CAAC;CACJ;AAPD,4BAOC"}

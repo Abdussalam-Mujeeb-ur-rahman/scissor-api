@@ -142,24 +142,10 @@ GET /{shortId}
 
 ### User Management (Protected)
 
-#### Get All Users
-
-```http
-GET /user
-Cookie: sessionToken=your_session_token
-```
-
-#### Get User by ID
-
-```http
-GET /user/{userId}
-Cookie: sessionToken=your_session_token
-```
-
 #### Update User
 
 ```http
-PATCH /user/{userId}
+PATCH /user/updateUser/{userId}
 Content-Type: application/json
 Cookie: sessionToken=your_session_token
 
@@ -171,7 +157,7 @@ Cookie: sessionToken=your_session_token
 #### Delete User
 
 ```http
-DELETE /user/{userId}
+DELETE /user/deleteUser/{userId}
 Cookie: sessionToken=your_session_token
 ```
 

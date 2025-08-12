@@ -1,49 +1,61 @@
-import { sendConfirmationEmail } from '../../src/utils/sendGrid';
-import sgMail from '@sendgrid/mail';
+import { sendConfirmationEmail } from "../../src/utils/sendGrid";
 
-jest.mock('@sendgrid/mail', () => ({
-  setApiKey: jest.fn(),
-  send: jest.fn(),
+// Mock nodemailer
+jest.mock("nodemailer", () => ({
+  createTransport: jest.fn(() => ({
+    sendMail: jest.fn(),
+  })),
 }));
 
-describe('sendConfirmationEmail', () => {
-  it('should send an email and return a success message', async () => {
-    const email = 'ayodejiabdussalam@gmail.com';
-    const confirmationLink = 'https://example.com/confirm';
+describe("sendConfirmationEmail", () => {
+  let mockSendMail: jest.Mock;
 
-    // Set up the expected message
-    const expectedMsg = {
+  beforeEach(() => {
+    // Get the mock function from the module
+    const nodemailer = require("nodemailer");
+    mockSendMail = nodemailer.createTransport().sendMail;
+    mockSendMail.mockClear();
+  });
+
+  it("should send an email and return a success message", async () => {
+    const email = "ayodejiabdussalam@gmail.com";
+    const confirmationLink = "https://example.com/confirm";
+
+    // Set up the expected mail options
+    const expectedMailOptions = {
+      from: "mjbabdussalam@gmail.com",
       to: email,
-      from: 'mjbabdussalam@gmail.com', 
-      subject: 'Email confirmation',
+      subject: "Email confirmation",
       text: `Please click on the following link to confirm your email: ${confirmationLink} .`,
-      html: `<p>Please click <a href=${confirmationLink}>here</a> to confirm your email.</p>`,
+      html: `<p>Please click <a href="${confirmationLink}">here</a> to confirm your email.</p>`,
     };
-    
-    // Mock the sgMail.send method to resolve immediately
-    (sgMail.send as jest.Mock).mockResolvedValueOnce({});
+
+    // Mock the sendMail method to resolve immediately
+    mockSendMail.mockResolvedValueOnce({});
 
     // Call the function
     const result = await sendConfirmationEmail(email, confirmationLink);
 
-    // Check that sgMail.send was called with the expected message
-    expect(sgMail.send).toHaveBeenCalledWith(expectedMsg);
+    // Check that sendMail was called with the expected options
+    expect(mockSendMail).toHaveBeenCalledWith(expectedMailOptions);
 
     // Check that the function returned the expected result
     expect(result).toEqual(`confirmation link has been sent to ${email}`);
   });
 
-  it('should return an error message when an error occurs', async () => {
-    const email = 'ayodejiabdussalam@gmail.com';
-    const confirmationLink = 'https://example.com/confirm';
+  it("should return an error message when an error occurs", async () => {
+    const email = "ayodejiabdussalam@gmail.com";
+    const confirmationLink = "https://example.com/confirm";
 
-    // Mock the sgMail.send method to reject with an error
-    (sgMail.send as jest.Mock).mockRejectedValueOnce(new Error('Test error'));
+    // Mock the sendMail method to reject with an error
+    mockSendMail.mockRejectedValueOnce(new Error("Test error"));
 
     // Call the function
     const result = await sendConfirmationEmail(email, confirmationLink);
 
     // Check that the function returned the expected error message
-    expect(result).toEqual('Error sending confirmation link. Please try again!');
+    expect(result).toEqual(
+      "Error sending confirmation link. Please try again!"
+    );
   });
 });
