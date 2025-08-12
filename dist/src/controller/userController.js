@@ -11,11 +11,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateUser = exports.deleteUser = void 0;
 const userModel_1 = require("../model/userModel");
+const urlModel_1 = require("../model/urlModel");
 const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
+        // Delete all URLs associated with this user first
+        yield (0, urlModel_1.deleteUrlsByUserId)(id);
+        // Then delete the user
         const deletedUser = yield (0, userModel_1.deleteUserById)(id);
-        return res.json({ message: "user has been deleted successfully!" });
+        return res.json({
+            message: "User and all associated URLs have been deleted successfully!",
+        });
     }
     catch (error) {
         next(error);
@@ -27,15 +33,15 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const { id } = req.params;
         const { name } = req.body;
         if (!name) {
-            return res.status(400).json({ message: 'Name is required!' });
+            return res.status(400).json({ message: "Name is required!" });
         }
         const user = yield (0, userModel_1.getUserById)(id);
         if (!user) {
-            return res.status(404).json({ message: 'User not found!' });
+            return res.status(404).json({ message: "User not found!" });
         }
         user.name = name;
         yield user.save();
-        res.status(200).json({ message: 'User updated successfully!', user: user });
+        res.status(200).json({ message: "User updated successfully!", user: user });
     }
     catch (error) {
         next(error);

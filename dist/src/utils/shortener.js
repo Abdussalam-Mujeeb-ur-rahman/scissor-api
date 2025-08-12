@@ -17,12 +17,19 @@ exports.shortenURL = void 0;
 const shortid_1 = __importDefault(require("shortid")); // import shortid module for generating unique short IDs
 const urlModel_1 = require("../model/urlModel"); // import URL_Model and shortenedURL types from urlModel
 // Define an async function to shorten a given URL, returning a Promise of type shortenedURL
-const shortenURL = (originalURL) => __awaiter(void 0, void 0, void 0, function* () {
-    const existingURL = yield urlModel_1.URL_Model.findOne({ original_url: originalURL }); // find an existing URL document in the database with the same original URL
+const shortenURL = (originalURL, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingURL = yield urlModel_1.URL_Model.findOne({
+        original_url: originalURL,
+        user_id: userId,
+    }); // find an existing URL document in the database with the same original URL and user ID
     if (existingURL)
         return existingURL; // if an existing URL is found, return it
     const short_id = shortid_1.default.generate(); // generate a unique short ID using shortid module
-    const newURL = new urlModel_1.URL_Model({ original_url: originalURL, short_id }); // create a new URL document with the original URL and generated short ID
+    const newURL = new urlModel_1.URL_Model({
+        original_url: originalURL,
+        short_id,
+        user_id: userId,
+    }); // create a new URL document with the original URL, generated short ID, and user ID
     yield newURL.save(); // save the new URL document to the database
     return newURL; // return the new URL document
 });

@@ -5,8 +5,9 @@ A URL shortening API built with Node.js, Express, TypeScript, and MongoDB.
 ## Features
 
 - **User Authentication**: Signup, email confirmation, and login with session-based authentication
-- **URL Shortening**: Create short URLs from long URLs
+- **URL Shortening**: Create short URLs from long URLs (associated with user accounts)
 - **URL Redirection**: Access short URLs to redirect to original URLs
+- **User Privacy**: All user URLs are automatically deleted when the user deletes their account
 - **Security**: Helmet for security headers, rate limiting, CORS, input validation
 - **Monitoring**: Sentry for error tracking, Treblle for API monitoring
 - **Email Service**: Nodemailer with Gmail SMTP for email confirmation
@@ -160,6 +161,8 @@ Cookie: sessionToken=your_session_token
 DELETE /user/deleteUser/{userId}
 Cookie: sessionToken=your_session_token
 ```
+
+**Note**: When a user deletes their account, all their associated URLs are automatically deleted as well for privacy and data cleanup.
 
 ## Security Features
 
